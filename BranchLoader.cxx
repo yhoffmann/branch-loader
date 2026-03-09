@@ -7,12 +7,9 @@
 #include <iostream>
 #include <utility>
 
-namespace YHelper {
-std::vector<bool> getBranchStatuses(const TTree* const t) {
-  TObjArray* branches =
-      ((TTree*)t)->GetListOfBranches(); /* fake it being non-const because the
-                                         * definition does not mark
-                                         * `GetListOfBranches` as const */
+namespace BranchLoader {
+std::vector<bool> getBranchStatuses(TTree* const t) {
+  TObjArray* branches = t->GetListOfBranches();
   std::size_t numBranches = branches->GetEntries();
   std::vector<bool> branchStatuses(numBranches);
   for (std::size_t i = 0; i < numBranches; i++) {
@@ -57,14 +54,6 @@ std::vector<T> getFromBranch(TTree* t, const TString& branchName) {
     return temp;
   }();
 
-  // std::vector<T> entries(numEntries);
-  // T currentVal;
-  // t->SetBranchAddress(branchName, &currentVal);
-  // for (std::size_t i = 0; i < numEntries; i++) {
-  //   t->GetEntry(i);
-  //   entries[i] = currentVal;
-  // }
-
   setBranchStatuses(t, initialBranchStatuses);
 
   return entries;
@@ -96,15 +85,6 @@ std::vector<std::tuple<Ts...>> getFromBranchMulti(
 
   std::vector<std::tuple<Ts...>> ret;
   ret.reserve(numEntries);
-  // std::tuple<Ts...> entry;
-  //
-  // std::size_t counter = 0;
-  // setBranchAddress(t, branchNames, entry, std::index_sequence_for<Ts...>{});
-  //
-  // for (std::size_t i = 0; i < numEntries; i++) {
-  //   t->GetEntry(i);
-  //   ret[i] = std::move(entry);
-  // }
 
   TTreeReader reader(t);
   std::tuple<TTreeReaderValue<Ts>...> readers = readerHandles<Ts...>(
@@ -123,4 +103,4 @@ std::vector<std::tuple<Ts...>> getFromBranchMulti(
 
   return ret;
 }
-}  // namespace YHelper
+}  // namespace BranchLoader
