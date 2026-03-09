@@ -8,9 +8,9 @@
 #include <utility>
 
 namespace BranchLoader {
-std::vector<bool> getBranchStatuses(TTree* const t) {
+std::vector<bool> getBranchStatuses(TTree* t) {
   TObjArray* branches = t->GetListOfBranches();
-  std::size_t numBranches = ((TTree*)branches)->GetEntries();
+  std::size_t numBranches = branches->GetEntries();
   std::vector<bool> branchStatuses(numBranches);
   for (std::size_t i = 0; i < numBranches; i++) {
     const TString branchName = ((TBranch*)branches->At(i))->GetName();
